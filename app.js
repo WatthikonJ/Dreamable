@@ -147,115 +147,31 @@ function renderStudentDashboard() {
     h('button', { class: 'btn ghost', onclick: logout }, 'Log out')
   ];
 
-  const kpis = h('div', { class: 'kpis' }, [
-    h('div', { class: 'kpi' }, [
-      h('h3', {}, 'My Credits'),
-      h('p', {}, `Ξ ${state.credits.student.balance}`)
-    ]),
-    h('div', { class: 'kpi' }, [
-      h('h3', {}, 'Assignments Left'),
-      h('p', {}, state.mock.assignments.length)
-    ]),
-    h('div', { class: 'kpi' }, [
-      h('h3', {}, 'Challenges Left'),
-      h('p', {}, state.mock.challenges.length)
-    ]),
-  ]);
-
-  const assignmentsList = h('div', { class: 'list' }, state.mock.assignments.map(a =>
-    h('div', { class: 'list-item' }, [
-      h('div', { class: 'ticket' }, [
-        h('div', { class: 'title' }, a.title),
-        h('div', { class: 'meta' }, `By: ${a.mentor} | Deadline: ${a.deadline}`)
-      ]),
-      h('div', { class: 'pill info' }, `+${a.credits} Credits`),
-    ])
-  ));
-
-  const challengesList = h('div', { class: 'list' }, state.mock.challenges.map(c =>
-    h('div', { class: 'list-item' }, [
-      h('div', { class: 'ticket' }, [
-        h('div', { class: 'title' }, c.title),
-        h('div', { class: 'meta' }, `Deadline: ${c.deadline}`)
-      ]),
-      h('div', { class: 'pill info' }, `+${c.credits} Credits`),
-    ])
-  ));
-
-  const redeem = () => {
-    showModal(h('div', {}, [
-      h('h2', {}, 'Redeem Credits'),
-      h('p', {}, 'This is a demo function. In a real app, this would process a redemption.'),
+  const content = h('div', { class: 'grid' }, [
+    h('div', { class: 'card home-card', onclick: () => navigate('student-challenges') }, [
+      h('h2', {}, 'Challenges'),
+      h('div', { class: 'muted' }, 'View and submit challenges'),
       h('div', { class: 'spacer' }),
-      h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
-    ]));
-  };
-
-  const redeemHistory = state.mock.redeems.map(r => 
-    h('tr', {}, [
-      h('td', {}, r.id),
-      h('td', {}, r.item),
-      h('td', {}, r.date)
-    ])
-  );
-
-  const historyTable = h('table', { class: 'table' }, [
-    h('thead', {}, [
-      h('tr', {}, [
-        h('th', {}, 'ID'),
-        h('th', {}, 'Item'),
-        h('th', {}, 'Date')
-      ])
+      h('button', { class: 'btn primary' }, 'Open')
     ]),
-    h('tbody', {}, redeemHistory)
-  ]);
-
-  const content = h('div', {}, [
-    h('div', { class: 'row' }, [
-      h('div', { style: 'flex: 1;' }, [
-        h('h2', {}, `Hello, ${state.user.name}!`),
-        h('div', { class: 'muted' }, 'Your DRE Dashboard')
-      ])
+    h('div', { class: 'card home-card', onclick: () => navigate('student-announcements') }, [
+      h('h2', {}, 'Announcements'),
+      h('div', { class: 'muted' }, 'See updates and details'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
     ]),
-    h('div', { class: 'spacer-lg' }),
-    kpis,
-    h('div', { class: 'spacer-lg' }),
-    h('div', { class: 'grid' }, [
-      h('div', { class: 'card' }, [
-        h('h2', {}, 'Assignments'),
-        h('div', { class: 'muted' }, 'Tasks assigned by mentors'),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'card-content-scroll' }, assignmentsList)
-      ]),
-      h('div', { class: 'card' }, [
-        h('h2', {}, 'Challenges'),
-        h('div', { class: 'muted' }, 'Team-based challenges'),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'card-content-scroll' }, challengesList)
-      ]),
-      h('div', { class: 'card' }, [
-        h('h2', {}, 'Redeem Credits'),
-        h('div', { class: 'muted' }, 'Redeem your credits for rewards.'),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'row' }, [
-          h('div', { style: 'flex: 1;' }, [
-            h('label', {}, 'Choose Item'),
-            h('select', { class: 'input' }, [
-              h('option', { value: '' }, 'Select a reward...'),
-              h('option', { value: 'coffee' }, 'Coffee (10 Credits)'),
-              h('option', { value: 'ticket' }, 'Movie Ticket (50 Credits)')
-            ])
-          ]),
-          h('div', { style: 'display: flex; align-items: flex-end;' }, [
-            h('button', { class: 'btn ok', onclick: redeem }, 'Redeem')
-          ])
-        ]),
-        h('div', { class: 'spacer-lg' }),
-        h('h3', {}, 'History'),
-        h('div', { class: 'spacer' }),
-        historyTable
-      ]),
-    ])
+    h('div', { class: 'card home-card', onclick: () => navigate('student-assignments') }, [
+      h('h2', {}, 'Assignments'),
+      h('div', { class: 'muted' }, 'Submit classroom assignments'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
+    ]),
+    h('div', { class: 'card home-card', onclick: () => navigate('student-credits') }, [
+      h('h2', {}, 'Credits Wallet'),
+      h('div', { class: 'muted' }, 'View and redeem credits'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
+    ]),
   ]);
 
   layout('Student Dashboard', navActions, content);
@@ -267,77 +183,37 @@ function renderMentorDashboard() {
     h('button', { class: 'btn ghost', onclick: logout }, 'Log out')
   ];
 
-  const submissionsList = h('div', { class: 'list' }, state.mock.submissions.map(s =>
-    h('div', { class: 'list-item' }, [
-      h('div', { class: 'ticket' }, [
-        h('div', { class: 'title' }, s.team),
-        h('div', { class: 'meta' }, `Challenge: ${s.challenge} | Submitted by: ${s.by}`)
-      ]),
-      h('button', { class: 'btn info' }, `View File`),
-    ])
-  ));
-
-  const redeem = () => {
-    showModal(h('div', {}, [
-      h('h2', {}, 'Redeem Credits'),
-      h('p', {}, 'This is a demo function. In a real app, this would process a redemption.'),
+  const content = h('div', { class: 'grid' }, [
+    h('div', { class: 'card home-card', onclick: () => navigate('mentor-agenda') }, [
+      h('h2', {}, 'Agenda'),
+      h('div', { class: 'muted' }, 'View program agenda'),
       h('div', { class: 'spacer' }),
-      h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
-    ]));
-  };
-
-  const grantCredit = () => {
-    showModal(h('div', {}, [
-      h('h2', {}, 'Grant Credits'),
-      h('p', {}, 'This is a demo function. In a real app, this would grant credits to a user.'),
-      h('div', { class: 'spacer' }),
-      h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
-    ]));
-  };
-
-  const content = h('div', {}, [
-    h('div', { class: 'row' }, [
-      h('div', { style: 'flex: 1;' }, [
-        h('h2', {}, `Hello, Mentor ${state.user.name}!`),
-        h('div', { class: 'muted' }, 'Review pending submissions')
-      ])
+      h('button', { class: 'btn primary' }, 'Open')
     ]),
-    h('div', { class: 'spacer-lg' }),
-    h('div', { class: 'grid' }, [
-      h('div', { class: 'card' }, [
-        h('h2', {}, 'Submissions to Review'),
-        h('div', { class: 'muted' }, 'List of all submitted challenges'),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'card-content-scroll' }, submissionsList)
-      ]),
-      h('div', { class: 'card' }, [
-        h('h2', {}, 'Credits to Grant'),
-        h('div', { class: 'muted' }, 'Grant credits to team members for their work.'),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'field' }, [
-          h('label', {}, 'Select Team Member'),
-          h('select', { class: 'input' }, [
-            h('option', {}, 'Team Alpha - Alice'),
-            h('option', {}, 'Team Beta - Bob')
-          ])
-        ]),
-        h('div', { class: 'field' }, [
-          h('label', {}, 'Credits Amount'),
-          h('input', { type: 'number', class: 'input', placeholder: 'e.g., 50', value: '50' })
-        ]),
-        h('div', { class: 'row right' }, [
-          h('button', { class: 'btn ok', onclick: grantCredit }, 'Confirm Grant')
-        ]),
-        h('div', { class: 'spacer-lg' }),
-        h('h3', {}, 'My Balance'),
-        h('div', { class: 'muted' }, 'You can redeem your credits for rewards.'),
-        h('div', { class: 'spacer' }),
-        h('p', {}, `Ξ ${state.credits.mentor.balance}`),
-        h('div', { class: 'row right' }, [
-          h('button', { class: 'btn primary', onclick: redeem }, 'Redeem')
-        ])
-      ])
-    ])
+    h('div', { class: 'card home-card', onclick: () => navigate('mentor-challenges') }, [
+      h('h2', {}, 'Challenges'),
+      h('div', { class: 'muted' }, 'View challenges (read-only)'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
+    ]),
+    h('div', { class: 'card home-card', onclick: () => navigate('mentor-submissions') }, [
+      h('h2', {}, 'View Submissions'),
+      h('div', { class: 'muted' }, 'Review student submissions'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
+    ]),
+    h('div', { class: 'card home-card', onclick: () => navigate('mentor-credits') }, [
+      h('h2', {}, 'Give Credits'),
+      h('div', { class: 'muted' }, 'Give mentor-specific credits'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
+    ]),
+    h('div', { class: 'card home-card', onclick: () => navigate('mentor-assignments') }, [
+      h('h2', {}, 'Assignments'),
+      h('div', { class: 'muted' }, 'Classroom-like assignments'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary' }, 'Open')
+    ]),
   ]);
 
   layout('Mentor Dashboard', navActions, content);
@@ -898,6 +774,7 @@ function renderGiveCredits() {
 
     const userToUpdate = state.mock.users.find(u => u.id === user);
     if (userToUpdate) {
+      // Update user's credit balance
       if (userToUpdate.role === 'student') {
         state.credits.student.balance += credits;
       } else if (userToUpdate.role === 'mentor') {
@@ -905,17 +782,30 @@ function renderGiveCredits() {
       }
       state.credits.admin.totalGranted += credits;
 
-      // สามารถเพิ่ม logic การบันทึก credit history ได้ที่นี่
-      console.log(`Granted ${credits} credits to ${userToUpdate.name} for: ${reason}`);
-      localStorage.setItem('credits', JSON.stringify(state.credits));
-    }
+      // Add to credit history
+      const creditHistory = JSON.parse(localStorage.getItem('creditHistory')) || [];
+      creditHistory.push({
+        id: `ch${Date.now()}`,
+        userId: userToUpdate.id,
+        userName: userToUpdate.name,
+        change: credits,
+        by: state.user.name,
+        category: form.category_select.value || 'admin',
+        reason: reason,
+        timestamp: new Date().toLocaleString()
+      });
+      localStorage.setItem('creditHistory', JSON.stringify(creditHistory));
 
-    showModal(h('div', {}, [
-      h('h2', {}, 'สำเร็จ'),
-      h('p', {}, `มอบเครดิตจำนวน ${credits} ให้กับ ${userToUpdate.name} เรียบร้อยแล้ว`),
-      h('div', { class: 'spacer' }),
-      h('button', { class: 'btn primary', onclick: hideModal }, 'ตกลง')
-    ]));
+      // Save credits
+      localStorage.setItem('credits', JSON.stringify(state.credits));
+
+      showModal(h('div', {}, [
+        h('h2', {}, 'สำเร็จ'),
+        h('p', {}, `มอบเครดิตจำนวน ${credits} ให้กับ ${userToUpdate.name} เรียบร้อยแล้ว`),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'btn primary', onclick: hideModal }, 'ตกลง')
+      ]));
+    }
   };
 
   const content = h('div', { class: 'card' }, [
@@ -1101,6 +991,1352 @@ function logout() {
   render();
 }
 
+// --- Student Pages ---
+function renderStudentChallenges() {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  const challengesList = h('div', { class: 'list' }, state.mock.challenges.map(c =>
+    h('div', { class: 'list-item' }, [
+      h('div', { class: 'ticket' }, [
+        h('div', { class: 'title' }, c.title),
+        h('div', { class: 'meta' }, `Due ${c.deadline} • ${c.credits} pts`)
+      ]),
+      h('button', { class: 'btn', onclick: () => navigate(`student-challenge/${c.id}`) }, 'Open')
+    ])
+  ));
+  
+  const content = h('div', {}, [
+    h('div', { class: 'row' }, [
+      h('div', { style: 'flex: 1;' }, [
+        h('h2', {}, 'Challenges'),
+        h('div', { class: 'muted' }, 'View and submit challenges')
+      ])
+    ]),
+    h('div', { class: 'spacer' }),
+    challengesList
+  ]);
+  
+  layout('Challenges', actions, content);
+}
+
+function renderStudentChallenge(id) {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const challenge = state.mock.challenges.find(c => c.id === id);
+  if (!challenge) {
+    navigate('student-challenges');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('student-challenges') }, 'Back')];
+  
+  const filesInput = h('input', { type: 'file', multiple: true, class: 'input' });
+  
+  const submit = () => {
+    if (filesInput.files.length === 0) {
+      showModal(h('div', {}, [
+        h('h2', {}, 'No Files Selected'),
+        h('p', {}, 'Please select at least one file to submit.'),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+      ]));
+      return;
+    }
+    
+    showModal(h('div', {}, [
+      h('h2', {}, 'Confirm Submission'),
+      h('p', {}, `Submit ${filesInput.files.length} file(s) for "${challenge.title}"?`),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row right' }, [
+        h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
+        h('button', { class: 'btn primary', onclick: () => {
+          // Create new submission
+          const newSubmission = {
+            id: `s${Date.now()}`,
+            team: state.user.team,
+            challenge: challenge.title,
+            by: state.user.name,
+            at: new Date().toLocaleString(),
+            status: 'Submitted',
+            grade: null,
+            files: Array.from(filesInput.files).map(file => ({
+              name: file.name,
+              size: `${(file.size / 1024).toFixed(1)}KB`
+            }))
+          };
+          
+          // Add to submissions
+          state.mock.submissions.push(newSubmission);
+          localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
+          
+          alert('Submission sent successfully!');
+          hideModal();
+          navigate('student-challenges');
+        }}, 'Submit')
+      ])
+    ]));
+  };
+  
+  const content = h('div', { class: 'card' }, [
+    h('h2', {}, challenge.title),
+    h('div', { class: 'muted' }, `Due ${challenge.deadline}`),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'Attach File(s)'),
+      filesInput
+    ]),
+    h('div', { class: 'spacer' }),
+    h('button', { class: 'btn primary', onclick: submit }, 'Submit')
+  ]);
+  
+  layout('Challenge Detail', actions, content);
+}
+
+function renderStudentAnnouncements() {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  // Load announcements from localStorage or use default
+  const announcements = JSON.parse(localStorage.getItem('announcements')) || [
+    { id: 'a1', title: 'Welcome!', body: 'Kickoff is on Friday 10am, bring your laptops.', read: false },
+    { id: 'a2', title: 'API Keys', body: 'Check your email for sandbox keys.', read: false },
+  ];
+  
+  const all = announcements;
+  const visible = all.slice(0, 5);
+  const list = h('div', { class: 'list' }, visible.map(a =>
+    h('div', { class: 'list-item' }, [
+      h('div', { class: 'ticket' }, [
+        h('div', { class: 'title' }, a.title),
+        h('div', { class: 'meta' }, 'Tap for details')
+      ]),
+      h('div', { class: 'row' }, [
+        h('span', { class: `pill ${a.read ? 'info' : 'warn'}` }, a.read ? 'Read' : 'Unread'),
+        h('button', { class: 'btn', onclick: () => navigate(`student-announcement/${a.id}`) }, 'Open')
+      ])
+    ])
+  ));
+  
+  const viewAll = all.length > 5 ? h('div', { class: 'list-actions' }, [
+    h('button', { class: 'btn ghost', onclick: () => {
+      list.innerHTML = '';
+      all.forEach(a => list.appendChild(
+        h('div', { class: 'list-item' }, [
+          h('div', { class: 'ticket' }, [
+            h('div', { class: 'title' }, a.title),
+            h('div', { class: 'meta' }, 'Tap for details')
+          ]),
+          h('div', { class: 'row' }, [
+            h('span', { class: `pill ${a.read ? 'info' : 'warn'}` }, a.read ? 'Read' : 'Unread'),
+            h('button', { class: 'btn', onclick: () => navigate(`student-announcement/${a.id}`) }, 'Open')
+          ])
+        ])
+      ));
+    }}, 'View All')
+  ]) : null;
+  
+  const content = h('div', {}, [list, viewAll]);
+  layout('Announcements', actions, content);
+}
+
+function renderStudentAnnouncement(id) {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  // Load announcements from localStorage or use default
+  const announcements = JSON.parse(localStorage.getItem('announcements')) || [
+    { id: 'a1', title: 'Welcome!', body: 'Kickoff is on Friday 10am, bring your laptops.', read: false },
+    { id: 'a2', title: 'API Keys', body: 'Check your email for sandbox keys.', read: false },
+  ];
+  
+  const announcement = announcements.find(a => a.id === id);
+  if (!announcement) {
+    navigate('student-announcements');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('student-announcements') }, 'Back')];
+  
+  const markRead = () => {
+    announcement.read = true;
+    // Save to localStorage
+    localStorage.setItem('announcements', JSON.stringify(announcements));
+    showModal(h('div', {}, [
+      h('h2', {}, 'Marked as Read'),
+      h('p', {}, 'This announcement has been marked as read.'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary', onclick: () => {
+        hideModal();
+        // Re-render the page to update the UI
+        renderStudentAnnouncement(id);
+      }}, 'OK')
+    ]));
+  };
+  
+  const content = h('div', { class: 'card' }, [
+    h('h2', {}, announcement.title),
+    h('div', { class: 'spacer' }),
+    h('div', {}, announcement.body),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'row right' }, [
+      h('span', { class: `pill ${announcement.read ? 'info' : 'warn'}` }, announcement.read ? 'Read' : 'Unread'),
+      h('button', { class: 'btn primary', onclick: markRead }, 'Mark as Read')
+    ])
+  ]);
+  
+  layout('Announcement Detail', actions, content);
+}
+
+function renderStudentAssignments() {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  // Mock student submissions with grades
+  const studentSubmissions = [
+    { id: 's1', assignment: 'Week 1: HTML/CSS', submitted: true, graded: true, grade: { overall: 'good', score: 'excellent', comment: 'Excellent work!' } },
+    { id: 's2', assignment: 'Week 1: JS Basics', submitted: true, graded: false, grade: null },
+    { id: 's3', assignment: 'Week 2: React', submitted: false, graded: false, grade: null }
+  ];
+  
+  const assignmentsList = h('div', { class: 'list' }, state.mock.assignments.map(a => {
+    const submission = studentSubmissions.find(s => s.assignment === a.title);
+    const status = submission?.submitted ? (submission?.graded ? 'Graded' : 'Submitted') : 'Not Submitted';
+    const statusColor = submission?.graded ? 'ok' : submission?.submitted ? 'warn' : 'danger';
+    
+    return h('div', { class: 'list-item' }, [
+      h('div', { class: 'ticket' }, [
+        h('div', { class: 'title' }, a.title),
+        h('div', { class: 'meta' }, `Due ${a.deadline}`)
+      ]),
+      h('div', { class: 'row' }, [
+        h('span', { class: `pill ${statusColor}` }, status),
+        h('button', { 
+          class: 'btn', 
+          onclick: () => {
+            if (submission?.graded) {
+              navigate(`student-assignment-grade/${submission.id}`);
+            } else {
+              navigate(`student-assignment/${a.id}`);
+            }
+          }
+        }, submission?.graded ? 'View Grade' : 'Open')
+      ])
+    ]);
+  }));
+  
+  const content = h('div', {}, [assignmentsList]);
+  layout('Assignments', actions, content);
+}
+
+function renderStudentAssignment(id) {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const assignment = state.mock.assignments.find(a => a.id === id);
+  if (!assignment) {
+    navigate('student-assignments');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('student-assignments') }, 'Back')];
+  
+  // Assignment logo placeholder
+  const assignmentLogo = h('div', { 
+    class: 'assignment-logo',
+    style: 'width: 80px; height: 80px; border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated); font-size: 24px; color: var(--muted);'
+  }, '📝');
+  
+  // Assignment header section
+  const assignmentHeader = h('div', { class: 'row', style: 'align-items: flex-start; gap: 16px;' }, [
+    assignmentLogo,
+    h('div', { style: 'flex: 1;' }, [
+      h('h2', { style: 'margin: 0 0 8px 0;' }, assignment.title),
+      h('div', { class: 'muted', style: 'line-height: 1.5;' }, 
+        assignment.description || 'Complete this assignment according to the requirements. Submit your work before the due date.')
+    ])
+  ]);
+  
+  // File display section
+  const fileDisplay = h('div', { class: 'field' }, [
+    h('label', {}, 'File'),
+    h('div', { 
+      class: 'file-display',
+      style: 'padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elevated); display: flex; align-items: center; gap: 8px;'
+    }, [
+      h('span', { style: 'font-size: 16px;' }, '📄'),
+      h('span', {}, 'Example.txt')
+    ])
+  ]);
+  
+  // Upload area
+  const uploadArea = h('div', { 
+    class: 'upload-area',
+    style: 'border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; background: var(--bg-elevated); cursor: pointer; transition: all 0.2s ease;',
+    onclick: () => document.getElementById('file-upload').click()
+  }, [
+    h('div', { style: 'font-size: 24px; margin-bottom: 8px;' }, '📁'),
+    h('div', { class: 'muted' }, 'Upload File')
+  ]);
+  
+  const filesInput = h('input', { 
+    type: 'file', 
+    multiple: true, 
+    id: 'file-upload',
+    style: 'display: none;',
+    onchange: (e) => {
+      const uploadArea = document.querySelector('.upload-area');
+      if (e.target.files.length > 0) {
+        uploadArea.innerHTML = `
+          <div style="font-size: 24px; margin-bottom: 8px;">✅</div>
+          <div class="muted">${e.target.files.length} file(s) selected</div>
+        `;
+        uploadArea.style.borderColor = 'var(--accent)';
+        uploadArea.style.background = 'var(--bg-elevated)';
+      }
+    }
+  });
+  
+  const submit = () => {
+    const files = document.getElementById('file-upload').files;
+    if (files.length === 0) {
+      showModal(h('div', {}, [
+        h('h2', {}, 'No Files Selected'),
+        h('p', {}, 'Please select at least one file to submit.'),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+      ]));
+      return;
+    }
+    
+    showModal(h('div', {}, [
+      h('h2', {}, 'Submit Assignment'),
+      h('p', {}, `Submit ${files.length} file(s) for "${assignment.title}"?`),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row right' }, [
+        h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
+        h('button', { class: 'btn primary', onclick: () => {
+          // Create new submission
+          const newSubmission = {
+            id: `s${Date.now()}`,
+            team: state.user.team,
+            assignment: assignment.title,
+            by: state.user.name,
+            at: new Date().toLocaleString(),
+            status: 'Submitted',
+            grade: null,
+            files: Array.from(files).map(file => ({
+              name: file.name,
+              size: `${(file.size / 1024).toFixed(1)}KB`
+            }))
+          };
+          
+          // Add to submissions
+          state.mock.submissions.push(newSubmission);
+          localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
+          
+          alert('Assignment submitted successfully!');
+          hideModal();
+          navigate('student-assignments');
+        }}, 'Submit')
+      ])
+    ]));
+  };
+  
+  const content = h('div', { class: 'card' }, [
+    assignmentHeader,
+    h('div', { class: 'spacer-lg' }),
+    fileDisplay,
+    h('div', { class: 'spacer' }),
+    uploadArea,
+    filesInput,
+    h('div', { class: 'spacer-lg' }),
+    h('button', { class: 'btn primary', onclick: submit }, 'Submit')
+  ]);
+  
+  layout('Assignment Detail', actions, content);
+}
+
+function renderStudentAssignmentGrade(id) {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('student-assignments') }, 'Back')];
+  
+  // Mock grade data
+  const gradeData = {
+    assignment: 'Week 1: HTML/CSS',
+    submittedBy: 'You',
+    team: 'Team Alpha',
+    submittedAt: '2025-09-10 14:20',
+    overallComment: 'good',
+    score: 'excellent',
+    comment: 'Excellent work! Your code is clean and well-structured. Keep up the great work!'
+  };
+  
+  // Rubric score options
+  const rubricOptions = [
+    { value: 'improve', label: 'ปรับปรุง', color: 'danger' },
+    { value: 'fair', label: 'พอใช้', color: 'warn' },
+    { value: 'good', label: 'ดี', color: 'ok' },
+    { value: 'excellent', label: 'ดีเยี่ยม', color: 'ok' }
+  ];
+  
+  const overallLabel = rubricOptions.find(o => o.value === gradeData.overallComment)?.label;
+  const scoreLabel = rubricOptions.find(o => o.value === gradeData.score)?.label;
+  
+  // Before submission section
+  const beforeSubmissionSection = h('div', { class: 'card' }, [
+    h('h2', {}, gradeData.assignment),
+    h('div', { class: 'muted' }, `Submitted by ${gradeData.submittedBy} (${gradeData.team}) on ${gradeData.submittedAt}`),
+    h('div', { class: 'spacer' }),
+    
+    // Attached files section
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ไฟล์แนบ (Attached Files)'),
+      h('div', { class: 'muted' }, 'example.txt'),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row', style: 'gap: 8px;' }, [
+        h('div', { class: 'file-preview', style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' }, '📄'),
+        h('div', { class: 'file-preview', style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' }, '📄')
+      ])
+    ])
+  ]);
+  
+  // After submission section (graded results)
+  const afterSubmissionSection = h('div', { class: 'card' }, [
+    h('div', { class: 'field' }, [
+      h('label', {}, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+      h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ความเห็นรวม (Overall Comment)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+        h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.overallComment)?.color}` }, overallLabel)
+      ])
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ให้คะแนน (Give Score)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+        h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.score)?.color}` }, scoreLabel)
+      ])
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'Comment'),
+      h('div', { class: 'muted' }, gradeData.comment)
+    ])
+  ]);
+  
+  const content = h('div', { class: 'grid' }, [beforeSubmissionSection, afterSubmissionSection]);
+  layout('Assignment Grade', actions, content);
+}
+
+function renderStudentCredits() {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  const balance = state.credits.student.balance;
+  
+  // Mock data for member credits
+  const memberCredits = [
+    { name: 'Alice', credits: 45, team: 'Team Alpha' },
+    { name: 'Bob', credits: 32, team: 'Team Beta' },
+    { name: 'Charlie', credits: 58, team: 'Team Gamma' },
+    { name: 'David', credits: 28, team: 'Team Alpha' },
+    { name: 'Eve', credits: 41, team: 'Team Beta' },
+    { name: 'Frank', credits: 35, team: 'Team Gamma' }
+  ];
+  
+  // Mock tickets data
+  const tickets = [
+    { id: 't1', title: '1:1 Mentor Session', cost: 25, when: 'Sep 15, 2pm' },
+    { id: 't2', title: 'Design Review', cost: 30, when: 'Sep 16, 11am' },
+  ];
+  
+  const ticketSelect = h('select', { class: 'input' }, tickets.map(t => h('option', { value: t.id }, `${t.title} • ${t.cost} cr`)));
+  
+  const redeem = () => {
+    const selectedTicket = tickets.find(t => t.id === ticketSelect.value);
+    if (!selectedTicket) {
+      showModal(h('div', {}, [
+        h('h2', {}, 'No Ticket Selected'),
+        h('p', {}, 'Please select a ticket to redeem.'),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+      ]));
+      return;
+    }
+    
+    if (balance < selectedTicket.cost) {
+      showModal(h('div', {}, [
+        h('h2', {}, 'Insufficient Credits'),
+        h('p', {}, `You need ${selectedTicket.cost} credits but only have ${balance}.`),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+      ]));
+      return;
+    }
+    
+    showModal(h('div', {}, [
+      h('h2', {}, 'Redeem Session'),
+      h('p', {}, `Redeem ${selectedTicket.cost} credits for ${selectedTicket.title} at ${selectedTicket.when}?`),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row right' }, [
+        h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
+        h('button', { class: 'btn primary', onclick: () => {
+          // Deduct credits
+          state.credits.student.balance -= selectedTicket.cost;
+          
+          // Add to credit history
+          const creditHistory = JSON.parse(localStorage.getItem('creditHistory')) || [];
+          creditHistory.push({
+            id: `ch${Date.now()}`,
+            userId: state.user.id,
+            userName: state.user.name,
+            change: -selectedTicket.cost,
+            by: 'System',
+            category: 'redeem',
+            reason: `Redeemed for ${selectedTicket.title}`,
+            timestamp: new Date().toLocaleString()
+          });
+          localStorage.setItem('creditHistory', JSON.stringify(creditHistory));
+          
+          // Save credits
+          localStorage.setItem('credits', JSON.stringify(state.credits));
+          
+          alert('Redeemed successfully!');
+          hideModal();
+          // Refresh the page to show updated balance
+          renderStudentCredits();
+        }}, 'Redeem')
+      ])
+    ]));
+  };
+  
+  // Member credits section
+  const memberCreditsList = h('div', { class: 'list' }, memberCredits.map(member =>
+    h('div', { class: 'list-item' }, [
+      h('div', { class: 'ticket' }, [
+        h('div', { class: 'title' }, member.name),
+        h('div', { class: 'meta' }, member.team)
+      ]),
+      h('span', { class: 'pill ok' }, `${member.credits} credits`)
+    ])
+  ));
+  
+  // Credit history (load from localStorage)
+  const creditHistory = JSON.parse(localStorage.getItem('creditHistory')) || [];
+  const userCreditHistory = creditHistory.filter(h => h.userId === state.user.id);
+  
+  const openHistoryDetail = (item) => {
+    showModal(h('div', {}, [
+      h('h2', {}, 'Credit Detail'),
+      h('div', { class: 'spacer' }),
+      h('div', {}, `${item.change > 0 ? '+' : ''}${item.change} credit${Math.abs(item.change) === 1 ? '' : 's'}`),
+      h('div', { class: 'muted' }, `Category: ${item.category}`),
+      h('div', { class: 'muted' }, `By: ${item.by}`),
+      h('div', { class: 'muted' }, `Time: ${item.timestamp}`),
+      h('div', { class: 'spacer' }),
+      h('div', {}, item.reason || ''),
+      h('div', { class: 'spacer-lg' }),
+      h('button', { class: 'btn primary', onclick: hideModal }, 'Close')
+    ]));
+  };
+  
+  const historyTable = h('div', { style: 'max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px;' }, [
+    h('table', { class: 'table', style: 'margin: 0;' }, [
+      h('thead', {}, h('tr', {}, [
+        h('th', {}, 'History'), h('th', {}, 'By'), h('th', {}, 'Category'), h('th', {}, '')
+      ])),
+      h('tbody', {}, userCreditHistory.length > 0 ? userCreditHistory.map(it => h('tr', {}, [
+        h('td', {}, `${it.change > 0 ? '+' : ''}${it.change} credit${Math.abs(it.change) === 1 ? '' : 's'}`),
+        h('td', {}, it.by),
+        h('td', {}, it.category),
+        h('td', {}, h('button', { class: 'btn', onclick: () => openHistoryDetail(it) }, 'Detail'))
+      ])) : [h('tr', {}, [h('td', { colspan: 4, style: 'text-align: center; color: var(--muted);' }, 'No credit history yet')])])
+    ])
+  ]);
+  
+  const content = h('div', { class: 'grid' }, [
+    h('div', { class: 'card' }, [
+      h('h2', {}, `Balance: ${balance} credits`),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [h('label', {}, 'Select Ticket/Session'), ticketSelect]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row right' }, [
+        h('button', { class: 'btn ok', onclick: redeem }, 'Confirm Redeem')
+      ]),
+      h('div', { class: 'spacer-lg' }),
+      h('h3', {}, 'History'),
+      h('div', { class: 'spacer' }),
+      historyTable
+    ]),
+    h('div', { class: 'card' }, [
+      h('h2', {}, 'Member Credits Earned'),
+      h('div', { class: 'muted' }, 'Credits earned by each team member'),
+      h('div', { class: 'spacer' }),
+      memberCreditsList
+    ])
+  ]);
+  
+  layout('Credits Wallet', actions, content);
+}
+
+// --- Mentor Pages ---
+function renderMentorAgenda() {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  const all = state.mock.agenda;
+  const visible = all.slice(0, 5);
+  const list = h('div', { class: 'list' }, visible.map(item =>
+    h('div', { class: 'list-item' }, [
+      h('div', { class: 'ticket' }, [
+        h('div', { class: 'title' }, `${item.title} • ${item.time}`),
+        h('div', { class: 'meta' }, `${item.date} · Room ${item.room}`)
+      ]),
+      h('span', { class: 'pill info' }, item.status || 'Scheduled')
+    ])
+  ));
+  
+  const viewAllBtn = all.length > 5 ? h('div', { class: 'list-actions' }, [
+    h('button', { class: 'btn ghost', onclick: () => {
+      list.innerHTML = '';
+      all.forEach(item => list.appendChild(
+        h('div', { class: 'list-item' }, [
+          h('div', { class: 'ticket' }, [
+            h('div', { class: 'title' }, `${item.title} • ${item.time}`),
+            h('div', { class: 'meta' }, `${item.date} · Room ${item.room}`)
+          ]),
+          h('span', { class: 'pill info' }, item.status || 'Scheduled')
+        ])
+      ));
+    }}, 'View All')
+  ]) : null;
+  
+  const content = h('div', {}, [list, viewAllBtn]);
+  layout('Agenda', actions, content);
+}
+
+function renderMentorChallenges() {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  const challengesList = h('div', { class: 'list' }, state.mock.challenges.map(c => {
+    const submissionCount = state.mock.submissions.filter(s => s.challenge === c.title).length;
+    return h('div', { class: 'list-item' }, [
+      h('div', { class: 'ticket' }, [
+        h('div', { class: 'title' }, c.title),
+        h('div', { class: 'meta' }, `Due ${c.deadline} · ${c.credits} points · ${submissionCount} submissions`)
+      ]),
+      h('div', { class: 'row' }, [
+        h('button', { class: 'btn', onclick: () => alert(`View details for ${c.title}`) }, 'View Details')
+      ])
+    ]);
+  }));
+  
+  const content = h('div', {}, [
+    h('h2', {}, 'Challenges'),
+    h('div', { class: 'muted' }, 'View all available challenges (read-only)'),
+    h('div', { class: 'spacer' }),
+    challengesList
+  ]);
+  
+  layout('Challenges', actions, content);
+}
+
+function renderMentorSubmissions() {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  // Get mentor's team from user data
+  const mentorTeam = state.user.team;
+  
+  // Filter submissions to only show mentor's team
+  const teamSubmissions = state.mock.submissions.filter(s => s.team === mentorTeam);
+  
+  const visible = teamSubmissions.slice(0, 5);
+  const tableBody = h('tbody', {}, visible.map(s => h('tr', {}, [
+    h('td', {}, s.team), 
+    h('td', {}, s.challenge || s.assignment || 'N/A'), 
+    h('td', {}, s.by), 
+    h('td', {}, s.at),
+    h('td', {}, h('span', { class: `pill ${s.status === 'Submitted' ? 'ok' : s.status === 'Graded' ? 'info' : 'warn'}` }, s.status || 'Pending')),
+    h('td', {}, h('button', { class: 'btn', onclick: () => navigate(`mentor-submission/${s.id}`) }, 'Open'))
+  ])));
+  
+  const table = h('table', { class: 'table' }, [
+    h('thead', {}, h('tr', {}, [
+      h('th', {}, 'Team'), h('th', {}, 'Challenge/Assignment'), h('th', {}, 'By'), h('th', {}, 'Submitted At'), h('th', {}, 'Status'), h('th', {}, '')
+    ])),
+    tableBody
+  ]);
+  
+  const viewAll = teamSubmissions.length > 5 ? h('div', { class: 'list-actions' }, [
+    h('button', { class: 'btn ghost', onclick: () => {
+      tableBody.innerHTML = '';
+      teamSubmissions.forEach(s => tableBody.appendChild(h('tr', {}, [
+        h('td', {}, s.team), 
+        h('td', {}, s.challenge || s.assignment || 'N/A'), 
+        h('td', {}, s.by), 
+        h('td', {}, s.at),
+        h('td', {}, h('span', { class: `pill ${s.status === 'Submitted' ? 'ok' : s.status === 'Graded' ? 'info' : 'warn'}` }, s.status || 'Pending')),
+        h('td', {}, h('button', { class: 'btn', onclick: () => navigate(`mentor-submission/${s.id}`) }, 'Open'))
+      ])));
+    }}, 'View All')
+  ]) : null;
+  
+  const content = h('div', {}, [
+    h('h2', {}, 'Submissions'),
+    h('div', { class: 'muted' }, `Submissions from ${mentorTeam}`),
+    h('div', { class: 'spacer' }),
+    table,
+    viewAll
+  ]);
+  
+  layout('Submissions', actions, content);
+}
+
+function renderMentorCredits() {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  // Get mentor's team from user data
+  const mentorTeam = state.user.team;
+  
+  // Get team members from users.json
+  const teamMembers = state.mock.users.filter(u => u.team === mentorTeam && u.role === 'student');
+  
+  const userSelect = h('select', { 
+    class: 'input',
+    id: 'mentor-user-select'
+  }, [
+    h('option', { value: '' }, 'Select User'),
+    ...teamMembers.map(member => 
+      h('option', { value: member.id }, member.name)
+    )
+  ]);
+  
+  const amountInput = h('input', { class: 'input', placeholder: 'Amount', type: 'number', min: '0', value: '5' });
+  const reasonInput = h('textarea', { class: 'input', placeholder: 'Add reason...', rows: 3 });
+  
+  const give = () => {
+    const selectedUser = userSelect.value;
+    const amount = parseInt(amountInput.value, 10);
+    const reason = reasonInput.value;
+    
+    if (!selectedUser || !amount) {
+      showModal(h('div', {}, [
+        h('h2', {}, 'Missing Information'),
+        h('p', {}, 'Please select a user and enter amount.'),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+      ]));
+      return;
+    }
+    
+    const user = teamMembers.find(m => m.id === selectedUser);
+    showModal(h('div', {}, [
+      h('h2', {}, 'Give Kudos'),
+      h('p', {}, `Give ${amount} credits to ${user?.name} (${mentorTeam})?${reason ? `\n\nReason: ${reason}` : ''}`),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row right' }, [
+        h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
+        h('button', { class: 'btn primary', onclick: () => {
+          // Update student's credit balance
+          state.credits.student.balance += amount;
+          
+          // Add to credit history
+          const creditHistory = JSON.parse(localStorage.getItem('creditHistory')) || [];
+          creditHistory.push({
+            id: `ch${Date.now()}`,
+            userId: user.id,
+            userName: user.name,
+            change: amount,
+            by: state.user.name,
+            category: 'mentor',
+            reason: reason,
+            timestamp: new Date().toLocaleString()
+          });
+          localStorage.setItem('creditHistory', JSON.stringify(creditHistory));
+          
+          // Save credits
+          localStorage.setItem('credits', JSON.stringify(state.credits));
+          
+          alert('Kudos sent successfully!');
+          hideModal();
+        }}, 'Give')
+      ])
+    ]));
+  };
+  
+  const content = h('div', { class: 'card' }, [
+    h('h2', {}, 'Give Credits'),
+    h('div', { class: 'muted' }, `Give credits to members of ${mentorTeam}`),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [h('label', {}, 'Team'), h('input', { class: 'input', value: mentorTeam, disabled: true })]),
+    h('div', { class: 'field' }, [h('label', {}, 'User'), userSelect]),
+    h('div', { class: 'field' }, [h('label', {}, 'Amount'), amountInput]),
+    h('div', { class: 'field' }, [h('label', {}, 'Description'), reasonInput]),
+    h('div', { class: 'spacer' }),
+    h('button', { class: 'btn ok', onclick: give }, 'Give Credits')
+  ]);
+  
+  layout('Mentor Give Credits', actions, content);
+}
+
+function renderMentorAssignments() {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
+  
+  // Get mentor's team from user data
+  const mentorTeam = state.user.team;
+  
+  // Assignment submissions table (filtered to mentor's team only)
+  const assignmentSubmissions = state.mock.submissions.filter(s => s.assignment && s.team === mentorTeam);
+  const submissionsTable = h('table', { class: 'table', id: 'mentor-assignment-submissions-table' }, [
+    h('thead', {}, h('tr', {}, [
+      h('th', {}, 'Assignment'), h('th', {}, 'By'), h('th', {}, 'Submitted At'), h('th', {}, 'Status'), h('th', {}, '')
+    ])),
+    h('tbody', {}, assignmentSubmissions.map(s => {
+      // Find assignment by title to get the ID
+      const assignment = state.mock.assignments.find(a => a.title === s.assignment);
+      return h('tr', {}, [
+        h('td', {}, s.assignment), h('td', {}, s.by), h('td', {}, s.at),
+        h('td', {}, h('span', { class: `pill ${s.status === 'Submitted' ? 'ok' : 'warn'}` }, s.status || 'Pending')),
+        h('td', {}, h('button', { class: 'btn', onclick: () => navigate(`mentor-assignment/${assignment?.id || 'as1'}`) }, 'Open'))
+      ]);
+    }))
+  ]);
+  
+  const content = h('div', {}, [
+    h('h2', {}, 'Assignment Submissions'),
+    h('div', { class: 'muted' }, `Submissions from ${mentorTeam}`),
+    h('div', { class: 'spacer' }),
+    submissionsTable
+  ]);
+  
+  layout('Assignments', actions, content);
+}
+
+function renderMentorAssignment(id) {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const assignment = state.mock.assignments.find(a => a.id === id);
+  if (!assignment) {
+    navigate('mentor-assignments');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('mentor-assignments') }, 'Back')];
+  
+  // Mock submitted files for this assignment
+  const submittedFiles = [
+    { name: 'homework.js', size: '2.3 KB' },
+    { name: 'styles.css', size: '1.1 KB' },
+    { name: 'index.html', size: '0.8 KB' }
+  ];
+  
+  // Assignment logo placeholder
+  const assignmentLogo = h('div', { 
+    class: 'assignment-logo',
+    style: 'width: 80px; height: 80px; border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated); font-size: 24px; color: var(--muted);'
+  }, '📝');
+  
+  // Assignment header section
+  const assignmentHeader = h('div', { class: 'row', style: 'align-items: flex-start; gap: 16px;' }, [
+    assignmentLogo,
+    h('div', { style: 'flex: 1;' }, [
+      h('h2', { style: 'margin: 0 0 8px 0;' }, assignment.title),
+      h('div', { class: 'muted', style: 'line-height: 1.5;' }, 
+        assignment.description || 'Complete this assignment according to the requirements. Submit your work before the due date.')
+    ])
+  ]);
+  
+  // Submitted files display
+  const filesDisplay = h('div', { class: 'field' }, [
+    h('label', {}, 'Submitted Files'),
+    ...submittedFiles.map(file => 
+      h('div', { 
+        class: 'file-display',
+        style: 'padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elevated); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;'
+      }, [
+        h('span', { style: 'font-size: 16px;' }, '📄'),
+        h('span', { style: 'flex: 1;' }, file.name),
+        h('span', { class: 'muted', style: 'font-size: 12px;' }, file.size)
+      ])
+    )
+  ]);
+  
+  // Grade button
+  const gradeButton = h('button', { 
+    class: 'btn primary', 
+    onclick: () => {
+      // Find first submission for this assignment to grade
+      const submission = state.mock.submissions.find(s => s.assignment === assignment.title);
+      if (submission) {
+        navigate(`mentor-grade-submission/${submission.id}`);
+      } else {
+        showModal(h('div', {}, [
+          h('h2', {}, 'No Submissions'),
+          h('p', {}, 'No submissions found for this assignment.'),
+          h('div', { class: 'spacer' }),
+          h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+        ]));
+      }
+    }
+  }, 'Grade');
+  
+  const content = h('div', { class: 'card' }, [
+    assignmentHeader,
+    h('div', { class: 'spacer-lg' }),
+    filesDisplay,
+    h('div', { class: 'spacer-lg' }),
+    h('div', { class: 'row right' }, [gradeButton])
+  ]);
+  
+  layout('Assignment Detail', actions, content);
+}
+
+function renderMentorSubmission(id) {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const submission = state.mock.submissions.find(s => s.id === id);
+  
+  if (!submission) {
+    showModal(h('div', {}, [
+      h('h2', {}, 'Submission Not Found'),
+      h('p', {}, 'The requested submission could not be found.'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary', onclick: () => {
+        hideModal();
+        navigate('mentor-submissions');
+      }}, 'OK')
+    ]));
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('mentor-submissions') }, 'Back')];
+  
+  // Check if already graded
+  const isGraded = submission.status === 'Graded' && submission.grade;
+  
+  // Rubric score options
+  const rubricOptions = [
+    { value: 'improve', label: 'ปรับปรุง', color: 'danger' },
+    { value: 'fair', label: 'พอใช้', color: 'warn' },
+    { value: 'good', label: 'ดี', color: 'ok' },
+    { value: 'excellent', label: 'ดีเยี่ยม', color: 'ok' }
+  ];
+  
+  // Before submission section (always shown)
+  const beforeSubmissionSection = h('div', { class: 'card' }, [
+    h('h2', {}, submission.assignment || submission.challenge || 'Submission'),
+    h('div', { class: 'muted' }, `Submitted by ${submission.by} (${submission.team}) on ${submission.at}`),
+    h('div', { class: 'spacer' }),
+    
+    // Attached files section
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ไฟล์แนบ (Attached Files)'),
+      h('div', { class: 'muted' }, submission.files ? submission.files.map(f => f.name).join(', ') : 'No files'),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row', style: 'gap: 8px;' }, 
+        (submission.files || []).map(file => 
+          h('div', { 
+            class: 'file-preview', 
+            style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' 
+          }, '📄')
+        )
+      )
+    ])
+  ]);
+  
+  if (!isGraded) {
+    // Show grading form
+    let selectedOverallComment = '';
+    let selectedScore = '';
+    
+    const overallCommentGroup = h('div', { class: 'field' }, [
+      h('label', {}, 'ความเห็นรวม (Overall Comment)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, 
+        rubricOptions.map(option => 
+          h('button', { 
+            class: `btn pill ${option.color}`,
+            onclick: (e) => {
+              e.target.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+              e.target.classList.add('selected');
+              selectedOverallComment = option.value;
+            }
+          }, option.label)
+        )
+      )
+    ]);
+    
+    const scoreGroup = h('div', { class: 'field' }, [
+      h('label', {}, 'ให้คะแนน (Give Score)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, 
+        rubricOptions.map(option => 
+          h('button', { 
+            class: `btn pill ${option.color}`,
+            onclick: (e) => {
+              e.target.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+              e.target.classList.add('selected');
+              selectedScore = option.value;
+            }
+          }, option.label)
+        )
+      )
+    ]);
+    
+    const commentInput = h('textarea', { 
+      class: 'input', 
+      placeholder: 'Comment...',
+      rows: 4
+    });
+    
+    const submitGrade = () => {
+      if (!selectedOverallComment || !selectedScore) {
+        showModal(h('div', {}, [
+          h('h2', {}, 'Missing Information'),
+          h('p', {}, 'Please select both overall comment and score.'),
+          h('div', { class: 'spacer' }),
+          h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+        ]));
+        return;
+      }
+      
+      const overallLabel = rubricOptions.find(o => o.value === selectedOverallComment)?.label;
+      const scoreLabel = rubricOptions.find(o => o.value === selectedScore)?.label;
+      
+      showModal(h('div', {}, [
+        h('h2', {}, 'Submit Grade'),
+        h('p', {}, `Submit grade for ${submission.by}'s submission?\n\nOverall: ${overallLabel}\nScore: ${scoreLabel}${commentInput.value ? `\n\nComment: ${commentInput.value}` : ''}`),
+        h('div', { class: 'spacer' }),
+        h('div', { class: 'row right' }, [
+          h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
+          h('button', { class: 'btn primary', onclick: () => {
+            // Update submission with grade
+            const submissionIndex = state.mock.submissions.findIndex(s => s.id === id);
+            if (submissionIndex !== -1) {
+              state.mock.submissions[submissionIndex].status = 'Graded';
+              state.mock.submissions[submissionIndex].grade = {
+                overallComment: selectedOverallComment,
+                score: selectedScore,
+                comment: commentInput.value,
+                gradedBy: state.user.name,
+                gradedAt: new Date().toLocaleString()
+              };
+              
+              // Award credits to student
+              const studentUser = state.mock.users.find(u => u.name === submission.by);
+              if (studentUser) {
+                const creditsToAward = selectedScore === 'excellent' ? 10 : selectedScore === 'good' ? 8 : selectedScore === 'fair' ? 5 : 2;
+                state.credits.student.balance += creditsToAward;
+                localStorage.setItem('credits', JSON.stringify(state.credits));
+              }
+              
+              localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
+            }
+            
+            alert('Grade submitted successfully!');
+            hideModal();
+            navigate('mentor-submissions');
+          }}, 'Submit Grade')
+        ])
+      ]));
+    };
+    
+    const afterSubmissionSection = h('div', { class: 'card' }, [
+      h('div', { class: 'field' }, [
+        h('label', {}, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+        h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
+      ]),
+      h('div', { class: 'spacer' }),
+      overallCommentGroup,
+      h('div', { class: 'spacer' }),
+      scoreGroup,
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [h('label', {}, 'Comment'), commentInput]),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary', onclick: submitGrade }, 'Submit Grade')
+    ]);
+    
+    const content = h('div', { class: 'grid' }, [beforeSubmissionSection, afterSubmissionSection]);
+    layout('Grade Submission', actions, content);
+  } else {
+    // Show graded results
+    const gradeData = submission.grade;
+    const overallLabel = rubricOptions.find(o => o.value === gradeData.overallComment)?.label;
+    const scoreLabel = rubricOptions.find(o => o.value === gradeData.score)?.label;
+    
+    const afterSubmissionSection = h('div', { class: 'card' }, [
+      h('div', { class: 'field' }, [
+        h('label', {}, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+        h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [
+        h('label', {}, 'ความเห็นรวม (Overall Comment)'),
+        h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+          h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.overallComment)?.color}` }, overallLabel)
+        ])
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [
+        h('label', {}, 'ให้คะแนน (Give Score)'),
+        h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+          h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.score)?.color}` }, scoreLabel)
+        ])
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [
+        h('label', {}, 'Comment'),
+        h('div', { class: 'muted' }, gradeData.comment)
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'muted', style: 'font-size: 12px;' }, `Graded by ${gradeData.gradedBy} on ${gradeData.gradedAt}`)
+    ]);
+    
+    const content = h('div', { class: 'grid' }, [beforeSubmissionSection, afterSubmissionSection]);
+    layout('Grade Submission', actions, content);
+  }
+}
+
+function renderMentorGradeSubmission(id) {
+  if (!state.user || state.user.role !== 'mentor') {
+    navigate('login');
+    return;
+  }
+  
+  const submission = state.mock.submissions.find(s => s.id === id);
+  
+  if (!submission) {
+    showModal(h('div', {}, [
+      h('h2', {}, 'Submission Not Found'),
+      h('p', {}, 'The requested submission could not be found.'),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary', onclick: () => {
+        hideModal();
+        navigate('mentor-assignments');
+      }}, 'OK')
+    ]));
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('mentor-assignments') }, 'Back')];
+  
+  // Mock grade data (in real app, this would come from database)
+  const isGraded = Math.random() > 0.5; // Random for demo
+  const gradeData = isGraded ? {
+    overallComment: 'good',
+    score: 'excellent',
+    comment: 'Excellent work! Keep improving.'
+  } : null;
+  
+  // Rubric score options
+  const rubricOptions = [
+    { value: 'improve', label: 'ปรับปรุง', color: 'danger' },
+    { value: 'fair', label: 'พอใช้', color: 'warn' },
+    { value: 'good', label: 'ดี', color: 'ok' },
+    { value: 'excellent', label: 'ดีเยี่ยม', color: 'ok' }
+  ];
+  
+  // Before submission section (always shown)
+  const beforeSubmissionSection = h('div', { class: 'card' }, [
+    h('h2', {}, submission.assignment || 'Assignment'),
+    h('div', { class: 'muted' }, `Submitted by ${submission.by} (${submission.team}) on ${submission.at}`),
+    h('div', { class: 'spacer' }),
+    
+    // Attached files section
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ไฟล์แนบ (Attached Files)'),
+      h('div', { class: 'muted' }, 'example.txt'),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row', style: 'gap: 8px;' }, [
+        h('div', { class: 'file-preview', style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' }, '📄'),
+        h('div', { class: 'file-preview', style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' }, '📄')
+      ])
+    ])
+  ]);
+  
+  if (!isGraded) {
+    // Show grading form
+    let selectedOverallComment = '';
+    let selectedScore = '';
+    
+    const overallCommentGroup = h('div', { class: 'field' }, [
+      h('label', {}, 'ความเห็นรวม (Overall Comment)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, 
+        rubricOptions.map(option => 
+          h('button', { 
+            class: `btn pill ${option.color}`,
+            onclick: (e) => {
+              e.target.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+              e.target.classList.add('selected');
+              selectedOverallComment = option.value;
+            }
+          }, option.label)
+        )
+      )
+    ]);
+    
+    const scoreGroup = h('div', { class: 'field' }, [
+      h('label', {}, 'ให้คะแนน (Give Score)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, 
+        rubricOptions.map(option => 
+          h('button', { 
+            class: `btn pill ${option.color}`,
+            onclick: (e) => {
+              e.target.parentNode.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+              e.target.classList.add('selected');
+              selectedScore = option.value;
+            }
+          }, option.label)
+        )
+      )
+    ]);
+    
+    const commentInput = h('textarea', { 
+      class: 'input', 
+      placeholder: 'Comment...',
+      rows: 4
+    });
+    
+    const submitGrade = () => {
+      if (!selectedOverallComment || !selectedScore) {
+        showModal(h('div', {}, [
+          h('h2', {}, 'Missing Information'),
+          h('p', {}, 'Please select both overall comment and score.'),
+          h('div', { class: 'spacer' }),
+          h('button', { class: 'btn primary', onclick: hideModal }, 'OK')
+        ]));
+        return;
+      }
+      
+      const overallLabel = rubricOptions.find(o => o.value === selectedOverallComment)?.label;
+      const scoreLabel = rubricOptions.find(o => o.value === selectedScore)?.label;
+      
+      showModal(h('div', {}, [
+        h('h2', {}, 'Submit Grade'),
+        h('p', {}, `Submit grade for ${submission.by}'s submission?\n\nOverall: ${overallLabel}\nScore: ${scoreLabel}${commentInput.value ? `\n\nComment: ${commentInput.value}` : ''}`),
+        h('div', { class: 'spacer' }),
+        h('div', { class: 'row right' }, [
+          h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
+          h('button', { class: 'btn primary', onclick: () => {
+            alert('Grade submitted successfully!');
+            hideModal();
+            navigate('mentor-assignments');
+          }}, 'Submit Grade')
+        ])
+      ]));
+    };
+    
+    const afterSubmissionSection = h('div', { class: 'card' }, [
+      h('div', { class: 'field' }, [
+        h('label', {}, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+        h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
+      ]),
+      h('div', { class: 'spacer' }),
+      overallCommentGroup,
+      h('div', { class: 'spacer' }),
+      scoreGroup,
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [h('label', {}, 'Comment'), commentInput]),
+      h('div', { class: 'spacer' }),
+      h('button', { class: 'btn primary', onclick: submitGrade }, 'Submit Grade')
+    ]);
+    
+    const content = h('div', { class: 'grid' }, [beforeSubmissionSection, afterSubmissionSection]);
+    layout('Grade Submission', actions, content);
+  } else {
+    // Show graded results
+    const overallLabel = rubricOptions.find(o => o.value === gradeData.overallComment)?.label;
+    const scoreLabel = rubricOptions.find(o => o.value === gradeData.score)?.label;
+    
+    const afterSubmissionSection = h('div', { class: 'card' }, [
+      h('div', { class: 'field' }, [
+        h('label', {}, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+        h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [
+        h('label', {}, 'ความเห็นรวม (Overall Comment)'),
+        h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+          h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.overallComment)?.color}` }, overallLabel)
+        ])
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [
+        h('label', {}, 'ให้คะแนน (Give Score)'),
+        h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+          h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.score)?.color}` }, scoreLabel)
+        ])
+      ]),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'field' }, [
+        h('label', {}, 'Comment'),
+        h('div', { class: 'muted' }, gradeData.comment)
+      ])
+    ]);
+    
+    const content = h('div', { class: 'grid' }, [beforeSubmissionSection, afterSubmissionSection]);
+    layout('Grade Submission', actions, content);
+  }
+}
+
 // --- Routes ---
 registerRoute('home', renderHomePage);
 registerRoute('login', renderLoginPage);
@@ -1114,6 +2350,26 @@ registerRoute('assignments/create', () => renderCreatePage('assignments'));
 registerRoute('assignments/edit/:id', (params) => renderEditAssignment(params.id)); // เพิ่ม route สำหรับแก้ไข Assignment
 registerRoute('assignments/view/:id', (params) => renderViewAssignment(params.id));
 registerRoute('credits/give', renderGiveCredits);
+
+// Student Routes
+registerRoute('student-challenges', renderStudentChallenges);
+registerRoute('student-challenge/:id', (params) => renderStudentChallenge(params.id));
+registerRoute('student-announcements', renderStudentAnnouncements);
+registerRoute('student-announcement/:id', (params) => renderStudentAnnouncement(params.id));
+registerRoute('student-assignments', renderStudentAssignments);
+registerRoute('student-assignment/:id', (params) => renderStudentAssignment(params.id));
+registerRoute('student-assignment-grade/:id', (params) => renderStudentAssignmentGrade(params.id));
+registerRoute('student-credits', renderStudentCredits);
+
+// Mentor Routes
+registerRoute('mentor-agenda', renderMentorAgenda);
+registerRoute('mentor-challenges', renderMentorChallenges);
+registerRoute('mentor-submissions', renderMentorSubmissions);
+registerRoute('mentor-submission/:id', (params) => renderMentorSubmission(params.id));
+registerRoute('mentor-credits', renderMentorCredits);
+registerRoute('mentor-assignments', renderMentorAssignments);
+registerRoute('mentor-assignment/:id', (params) => renderMentorAssignment(params.id));
+registerRoute('mentor-grade-submission/:id', (params) => renderMentorGradeSubmission(params.id));
 
 // Simple path-to-regex support for :id parameters
 function matchRoute(path) {
