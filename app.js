@@ -221,10 +221,10 @@ function showGradingModal(submission) {
     renderMentorSubmissions();
   };
   
-  const modalContent = h('div', { style: 'max-width: 800px; width: 90vw;' }, [
-    h('div', { style: 'display: flex; gap: 20px;' }, [
+  const modalContent = h('div', { style: 'max-width: 1000px; width: 95vw; max-height: 90vh; overflow-y: auto;' }, [
+    h('div', { style: 'display: flex; gap: 20px; min-height: 500px;' }, [
       // Left panel - Submission details
-      h('div', { style: 'flex: 1; background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border);' }, [
+      h('div', { style: 'flex: 1; background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); min-width: 300px;' }, [
         h('h2', { style: 'margin: 0 0 16px 0;' }, submission.assignment || submission.challenge || 'Submission'),
         h('div', { class: 'muted', style: 'margin-bottom: 20px;' }, `Submitted by ${submission.by} (${submission.team}) on ${submission.at}`),
         
@@ -303,11 +303,26 @@ function showGradingModal(submission) {
   showModal(modalContent);
 }
 
+
 // Simple modal
 let currentModal = null;
 function showModal(content) {
-  const backdrop = h('div', { class: 'modal-backdrop' }, [
-    h('div', { class: 'modal' }, [content])
+  const backdrop = h('div', { 
+    class: 'modal-backdrop',
+    onclick: (e) => {
+      if (e.target === backdrop) {
+        hideModal();
+      }
+    }
+  }, [
+    h('div', { class: 'modal' }, [
+      h('button', { 
+        class: 'modal-close',
+        onclick: hideModal,
+        style: 'position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); z-index: 10;'
+      }, '×'),
+      content
+    ])
   ]);
   document.body.appendChild(backdrop);
   setTimeout(() => backdrop.classList.add('show'), 10);
@@ -1244,15 +1259,34 @@ function renderStudentChallenges() {
   
   const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
   
-  const challengesList = h('div', { class: 'list' }, state.mock.challenges.map(c =>
-    h('div', { class: 'list-item' }, [
+  // Get real student submissions from state
+  const studentSubmissions = state.mock.submissions.filter(s => s.by === state.user.name);
+  
+  const challengesList = h('div', { class: 'list' }, state.mock.challenges.map(c => {
+    const submission = studentSubmissions.find(s => s.challenge === c.title);
+    const status = submission ? (submission.status === 'Graded' ? 'Graded' : 'Submitted') : 'Not Submitted';
+    const statusColor = submission?.status === 'Graded' ? 'ok' : submission ? 'warn' : 'danger';
+    
+    return h('div', { class: 'list-item' }, [
       h('div', { class: 'ticket' }, [
         h('div', { class: 'title' }, c.title),
         h('div', { class: 'meta' }, `Due ${c.deadline} • ${c.credits} pts`)
       ]),
-      h('button', { class: 'btn', onclick: () => navigate(`student-challenge/${c.id}`) }, 'Open')
-    ])
-  ));
+      h('div', { class: 'row' }, [
+        h('span', { class: `pill ${statusColor}` }, status),
+        h('button', { 
+          class: 'btn', 
+          onclick: () => {
+            if (submission?.status === 'Graded') {
+              navigate(`student-challenge-grade/${submission.id}`);
+            } else {
+              navigate(`student-challenge/${c.id}`);
+            }
+          }
+        }, submission?.status === 'Graded' ? 'View Grade' : 'Open')
+      ])
+    ]);
+  }));
   
   const content = h('div', {}, [
     h('div', { class: 'row' }, [
@@ -1453,35 +1487,31 @@ function renderStudentAssignments() {
   
   const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('home') }, 'Back')];
   
-  // Mock student submissions with grades
-  const studentSubmissions = [
-    { id: 's1', assignment: 'Week 1: HTML/CSS', submitted: true, graded: true, grade: { overall: 'good', score: 'excellent', comment: 'Excellent work!' } },
-    { id: 's2', assignment: 'Week 1: JS Basics', submitted: true, graded: false, grade: null },
-    { id: 's3', assignment: 'Week 2: React', submitted: false, graded: false, grade: null }
-  ];
+  // Get real student submissions from state
+  const studentSubmissions = state.mock.submissions.filter(s => s.by === state.user.name);
   
   const assignmentsList = h('div', { class: 'list' }, state.mock.assignments.map(a => {
     const submission = studentSubmissions.find(s => s.assignment === a.title);
-    const status = submission?.submitted ? (submission?.graded ? 'Graded' : 'Submitted') : 'Not Submitted';
-    const statusColor = submission?.graded ? 'ok' : submission?.submitted ? 'warn' : 'danger';
+    const status = submission ? (submission.status === 'Graded' ? 'Graded' : 'Submitted') : 'Not Submitted';
+    const statusColor = submission?.status === 'Graded' ? 'ok' : submission ? 'warn' : 'danger';
     
     return h('div', { class: 'list-item' }, [
       h('div', { class: 'ticket' }, [
         h('div', { class: 'title' }, a.title),
-        h('div', { class: 'meta' }, `Due ${a.deadline}`)
+        h('div', { class: 'meta' }, `Due ${a.deadline} • ${a.credits} credits`)
       ]),
       h('div', { class: 'row' }, [
         h('span', { class: `pill ${statusColor}` }, status),
         h('button', { 
           class: 'btn', 
           onclick: () => {
-            if (submission?.graded) {
+            if (submission?.status === 'Graded') {
               navigate(`student-assignment-grade/${submission.id}`);
             } else {
               navigate(`student-assignment/${a.id}`);
             }
           }
-        }, submission?.graded ? 'View Grade' : 'Open')
+        }, submission?.status === 'Graded' ? 'View Grade' : 'Open')
       ])
     ]);
   }));
@@ -1628,15 +1658,23 @@ function renderStudentAssignmentGrade(id) {
   
   const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('student-assignments') }, 'Back')];
   
-  // Mock grade data
+  // Get real submission data
+  const submission = state.mock.submissions.find(s => s.id === id);
+  if (!submission || !submission.grade) {
+    navigate('student-assignments');
+    return;
+  }
+  
   const gradeData = {
-    assignment: 'Week 1: HTML/CSS',
-    submittedBy: 'You',
-    team: 'Team Alpha',
-    submittedAt: '2025-09-10 14:20',
-    overallComment: 'good',
-    score: 'excellent',
-    comment: 'Excellent work! Your code is clean and well-structured. Keep up the great work!'
+    assignment: submission.assignment || submission.challenge,
+    submittedBy: submission.by,
+    team: submission.team,
+    submittedAt: submission.at,
+    overallComment: submission.grade.overallComment,
+    score: submission.grade.score,
+    comment: submission.grade.comment,
+    gradedBy: submission.grade.gradedBy,
+    gradedAt: submission.grade.gradedAt
   };
   
   // Rubric score options
@@ -1697,6 +1735,99 @@ function renderStudentAssignmentGrade(id) {
   
   const content = h('div', { class: 'grid-2-col' }, [beforeSubmissionSection, afterSubmissionSection]);
   layout('Assignment Grade', actions, content);
+}
+
+function renderStudentChallengeGrade(id) {
+  if (!state.user || state.user.role !== 'student') {
+    navigate('login');
+    return;
+  }
+  
+  const actions = [h('button', { class: 'btn ghost', onclick: () => navigate('student-challenges') }, 'Back')];
+  
+  // Get real submission data
+  const submission = state.mock.submissions.find(s => s.id === id);
+  if (!submission || !submission.grade) {
+    navigate('student-challenges');
+    return;
+  }
+  
+  const gradeData = {
+    challenge: submission.challenge || submission.assignment,
+    submittedBy: submission.by,
+    team: submission.team,
+    submittedAt: submission.at,
+    overallComment: submission.grade.overallComment,
+    score: submission.grade.score,
+    comment: submission.grade.comment,
+    gradedBy: submission.grade.gradedBy,
+    gradedAt: submission.grade.gradedAt
+  };
+  
+  // Rubric score options
+  const rubricOptions = [
+    { value: 'improve', label: 'ปรับปรุง', color: 'danger' },
+    { value: 'fair', label: 'พอใช้', color: 'warn' },
+    { value: 'good', label: 'ดี', color: 'ok' },
+    { value: 'excellent', label: 'ดีเยี่ยม', color: 'ok' }
+  ];
+  
+  const overallLabel = rubricOptions.find(o => o.value === gradeData.overallComment)?.label;
+  const scoreLabel = rubricOptions.find(o => o.value === gradeData.score)?.label;
+  
+  // Before submission section
+  const beforeSubmissionSection = h('div', { class: 'card' }, [
+    h('h2', {}, gradeData.challenge),
+    h('div', { class: 'muted' }, `Submitted by ${gradeData.submittedBy} (${gradeData.team}) on ${gradeData.submittedAt}`),
+    h('div', { class: 'spacer' }),
+    
+    // Attached files section
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ไฟล์แนบ (Attached Files)'),
+      h('div', { class: 'muted' }, submission.files ? submission.files.map(f => f.name).join(', ') : 'No files'),
+      h('div', { class: 'spacer' }),
+      h('div', { class: 'row', style: 'gap: 8px;' }, 
+        (submission.files || []).map(file => 
+          h('div', { 
+            class: 'file-preview', 
+            style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' 
+          }, '📄')
+        )
+      )
+    ])
+  ]);
+  
+  // After submission section (graded results)
+  const afterSubmissionSection = h('div', { class: 'card' }, [
+    h('div', { class: 'field' }, [
+      h('label', {}, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+      h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ความเห็นรวม (Overall Comment)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+        h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.overallComment)?.color}` }, overallLabel)
+      ])
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'ให้คะแนน (Give Score)'),
+      h('div', { class: 'row', style: 'gap: 8px; flex-wrap: wrap;' }, [
+        h('span', { class: `pill ${rubricOptions.find(o => o.value === gradeData.score)?.color}` }, scoreLabel)
+      ])
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'field' }, [
+      h('label', {}, 'Comment'),
+      h('div', { class: 'muted' }, gradeData.comment)
+    ]),
+    h('div', { class: 'spacer' }),
+    h('div', { class: 'muted', style: 'font-size: 12px;' }, `Graded by ${gradeData.gradedBy} on ${gradeData.gradedAt}`)
+  ]);
+  
+  const content = h('div', { class: 'grid-2-col' }, [beforeSubmissionSection, afterSubmissionSection]);
+  layout('Challenge Grade', actions, content);
 }
 
 function renderStudentCredits() {
@@ -2043,7 +2174,9 @@ function renderMentorSubmissions() {
       h('td', {}, s.by || 'N/A'), 
       h('td', {}, s.at || 'N/A'),
       h('td', {}, h('span', { class: `pill ${s.status === 'Submitted' ? 'ok' : s.status === 'Graded' ? 'info' : 'warn'}` }, s.status || 'Pending')),
-      h('td', { style: 'text-align: right; white-space: nowrap;' }, h('button', { class: 'btn primary', onclick: () => showGradingModal(s) }, 'Grade'))
+      h('td', { style: 'text-align: right; white-space: nowrap;' }, [
+        h('button', { class: 'btn primary', onclick: () => showGradingModal(s) }, 'Grade')
+      ])
     ])) : [h('tr', {}, [h('td', { colspan: 6, style: 'text-align: center; color: var(--muted);' }, 'No challenge submissions found')])])
   ]);
   
@@ -2058,7 +2191,9 @@ function renderMentorSubmissions() {
       h('td', {}, s.by || 'N/A'), 
       h('td', {}, s.at || 'N/A'),
       h('td', {}, h('span', { class: `pill ${s.status === 'Submitted' ? 'ok' : s.status === 'Graded' ? 'info' : 'warn'}` }, s.status || 'Pending')),
-      h('td', { style: 'text-align: right; white-space: nowrap;' }, h('button', { class: 'btn primary', onclick: () => showGradingModal(s) }, 'Grade'))
+      h('td', { style: 'text-align: right; white-space: nowrap;' }, [
+        h('button', { class: 'btn primary', onclick: () => showGradingModal(s) }, 'Grade')
+      ])
     ])) : [h('tr', {}, [h('td', { colspan: 6, style: 'text-align: center; color: var(--muted);' }, 'No assignment submissions found')])])
   ]);
   
@@ -2738,6 +2873,7 @@ registerRoute('credits/give', renderGiveCredits);
 // Student Routes
 registerRoute('student-challenges', renderStudentChallenges);
 registerRoute('student-challenge/:id', (params) => renderStudentChallenge(params.id));
+registerRoute('student-challenge-grade/:id', (params) => renderStudentChallengeGrade(params.id));
 registerRoute('student-announcements', renderStudentAnnouncements);
 registerRoute('student-announcement/:id', (params) => renderStudentAnnouncement(params.id));
 registerRoute('student-assignments', renderStudentAssignments);
