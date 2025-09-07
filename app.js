@@ -171,6 +171,349 @@ function h(tag, props, children) {
 }
 
 // Grading modal function
+// File handling functions
+function getFileIcon(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  const iconMap = {
+    'html': '🌐',
+    'css': '🎨',
+    'js': '⚡',
+    'json': '📋',
+    'md': '📝',
+    'txt': '📄',
+    'pdf': '📕',
+    'doc': '📘',
+    'docx': '📘',
+    'xls': '📊',
+    'xlsx': '📊',
+    'ppt': '📽️',
+    'pptx': '📽️',
+    'zip': '🗜️',
+    'rar': '🗜️',
+    'png': '🖼️',
+    'jpg': '🖼️',
+    'jpeg': '🖼️',
+    'gif': '🖼️',
+    'svg': '🖼️'
+  };
+  return iconMap[ext] || '📄';
+}
+
+function openFile(file, index) {
+  const fileExt = file.name.split('.').pop().toLowerCase();
+  const isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(fileExt);
+  const isCode = ['html', 'css', 'js', 'json', 'md', 'txt'].includes(fileExt);
+  
+  let contentElement;
+  
+  if (isImage) {
+    // For images, show a placeholder with download option
+    contentElement = h('div', { style: 'text-align: center; padding: 40px;' }, [
+      h('div', { style: 'font-size: 64px; margin-bottom: 20px;' }, getFileIcon(file.name)),
+      h('h3', { style: 'color: var(--text); margin-bottom: 10px;' }, file.name),
+      h('p', { style: 'color: var(--muted); margin-bottom: 20px;' }, `ขนาดไฟล์: ${file.size || 'ไม่ระบุ'}`),
+      h('p', { style: 'color: var(--muted); margin-bottom: 30px;' }, 'ไฟล์รูปภาพ - กรุณาดาวน์โหลดเพื่อดู'),
+      h('button', { 
+        class: 'btn primary',
+        onclick: () => downloadFile(file)
+      }, '📥 ดาวน์โหลดไฟล์รูปภาพ')
+    ]);
+  } else if (isCode) {
+    // For code files, show content
+    const fileContent = generateMockFileContent(file.name);
+    contentElement = h('div', { style: 'background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border);' }, [
+      h('div', { style: 'font-family: monospace; font-size: 14px; line-height: 1.5; white-space: pre-wrap; color: var(--text);' }, fileContent)
+    ]);
+  } else {
+    // For other files, show file info with download option
+    contentElement = h('div', { style: 'text-align: center; padding: 40px;' }, [
+      h('div', { style: 'font-size: 64px; margin-bottom: 20px;' }, getFileIcon(file.name)),
+      h('h3', { style: 'color: var(--text); margin-bottom: 10px;' }, file.name),
+      h('p', { style: 'color: var(--muted); margin-bottom: 20px;' }, `ขนาดไฟล์: ${file.size || 'ไม่ระบุ'}`),
+      h('p', { style: 'color: var(--muted); margin-bottom: 30px;' }, `ประเภทไฟล์: ${fileExt.toUpperCase()}`),
+      h('button', { 
+        class: 'btn primary',
+        onclick: () => downloadFile(file)
+      }, '📥 ดาวน์โหลดไฟล์')
+    ]);
+  }
+  
+  const modalContent = h('div', { style: 'max-width: 800px; width: 90vw; max-height: 80vh; overflow-y: auto;' }, [
+    h('div', { style: 'background: var(--gradient-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); color: var(--text);' }, [
+      h('div', { style: 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;' }, [
+        h('h2', { style: 'margin: 0; color: var(--text);' }, `${getFileIcon(file.name)} ${file.name}`),
+        h('div', { style: 'display: flex; gap: 8px;' }, [
+          h('button', { 
+            class: 'btn ghost',
+            onclick: () => downloadFile(file)
+          }, '📥 ดาวน์โหลด'),
+          h('button', { 
+            class: 'btn ghost',
+            onclick: () => hideFileModal()
+          }, '✕ ปิด')
+        ])
+      ]),
+      contentElement
+    ])
+  ]);
+  
+  showFileModal(modalContent);
+}
+
+function downloadFile(file) {
+  try {
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    let content, mimeType;
+    
+    // Determine content and MIME type based on file extension
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(fileExt)) {
+      // For images, create a simple placeholder with proper MIME type
+      content = `This is a placeholder for image file: ${file.name}\nFile size: ${file.size || 'Unknown'}\n\nIn a real application, this would be the actual image data.`;
+      mimeType = 'text/plain';
+    } else if (['pdf'].includes(fileExt)) {
+      content = `PDF File: ${file.name}\nFile size: ${file.size || 'Unknown'}\n\nThis is a placeholder for PDF content.`;
+      mimeType = 'text/plain';
+    } else if (['doc', 'docx'].includes(fileExt)) {
+      content = `Word Document: ${file.name}\nFile size: ${file.size || 'Unknown'}\n\nThis is a placeholder for Word document content.`;
+      mimeType = 'text/plain';
+    } else if (['xls', 'xlsx'].includes(fileExt)) {
+      content = `Excel Spreadsheet: ${file.name}\nFile size: ${file.size || 'Unknown'}\n\nThis is a placeholder for Excel content.`;
+      mimeType = 'text/plain';
+    } else if (['ppt', 'pptx'].includes(fileExt)) {
+      content = `PowerPoint Presentation: ${file.name}\nFile size: ${file.size || 'Unknown'}\n\nThis is a placeholder for PowerPoint content.`;
+      mimeType = 'text/plain';
+    } else if (['zip', 'rar'].includes(fileExt)) {
+      content = `Archive File: ${file.name}\nFile size: ${file.size || 'Unknown'}\n\nThis is a placeholder for archive content.`;
+      mimeType = 'text/plain';
+    } else {
+      // For code files and others
+      content = generateMockFileContent(file.name);
+      mimeType = 'text/plain';
+    }
+    
+    // Create blob with proper MIME type
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    a.style.display = 'none';
+    
+    // Add to DOM, click, and remove
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    // Clean up
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    // Show success message
+    showNotification(`ดาวน์โหลดไฟล์ "${file.name}" เรียบร้อยแล้ว!`, 'success');
+    
+  } catch (error) {
+    console.error('Download error:', error);
+    showNotification('เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์', 'error');
+  }
+}
+
+function downloadAllFiles(files) {
+  // Create a zip-like download (simplified - just download all files individually)
+  showNotification(`กำลังดาวน์โหลดไฟล์ทั้งหมด ${files.length} ไฟล์...`, 'info');
+  files.forEach((file, index) => {
+    setTimeout(() => downloadFile(file), index * 500); // Stagger downloads
+  });
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+  const notification = h('div', {
+    style: `
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) scale(0.8) !important;
+      background: var(--gradient-card);
+      color: var(--text);
+      padding: 24px 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      z-index: 10000 !important;
+      max-width: 500px;
+      min-width: 350px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      opacity: 0;
+    `
+  }, [
+    // Background accent line
+    h('div', { 
+      style: `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: ${getNotificationAccentColor(type)};
+      `
+    }),
+    h('div', { style: 'display: flex; align-items: flex-start; gap: 16px; position: relative; z-index: 1;' }, [
+      h('div', { 
+        style: `
+          font-size: 24px;
+          flex-shrink: 0;
+          margin-top: 2px;
+        ` 
+      }, getNotificationIcon(type)),
+      h('div', { style: 'flex: 1;' }, [
+        h('div', { 
+          style: `
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--text);
+          ` 
+        }, getNotificationTitle(type)),
+        h('div', { 
+          style: `
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--muted);
+          ` 
+        }, message)
+      ]),
+      h('button', {
+        style: `
+          background: none;
+          border: none;
+          color: var(--muted);
+          font-size: 18px;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        `,
+        onclick: () => {
+          notification.style.transform = 'translate(-50%, -50%) scale(0.8) !important';
+          notification.style.opacity = '0';
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 200);
+        }
+      }, '×')
+    ])
+  ]);
+  
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.style.transform = 'translate(-50%, -50%) scale(1) !important';
+    notification.style.opacity = '1';
+  }, 10);
+  
+  // Auto remove after 1.5 seconds
+  setTimeout(() => {
+    notification.style.transform = 'translate(-50%, -50%) scale(0.8) !important';
+    notification.style.opacity = '0';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 200);
+  }, 1500);
+}
+
+function getNotificationIcon(type) {
+  switch(type) {
+    case 'success': return '✅';
+    case 'error': return '❌';
+    case 'warning': return '⚠️';
+    case 'info': return 'ℹ️';
+    default: return 'ℹ️';
+  }
+}
+
+function getNotificationTitle(type) {
+  switch(type) {
+    case 'success': return 'สำเร็จ';
+    case 'error': return 'เกิดข้อผิดพลาด';
+    case 'warning': return 'คำเตือน';
+    case 'info': return 'ข้อมูล';
+    default: return 'ข้อมูล';
+  }
+}
+
+function getNotificationAccentColor(type) {
+  switch(type) {
+    case 'success': return 'var(--ok)';
+    case 'error': return 'var(--danger)';
+    case 'warning': return 'var(--warn)';
+    case 'info': return 'var(--accent)';
+    default: return 'var(--accent)';
+  }
+}
+
+function generateMockFileContent(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  
+  switch(ext) {
+    case 'html':
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Submission</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p>This is a student's HTML submission.</p>
+</body>
+</html>`;
+    case 'css':
+      return `/* Student CSS Submission */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}`;
+    case 'js':
+      return `// Student JavaScript Submission
+function greetUser(name) {
+    return \`Hello, \${name}!\`;
+}
+
+const message = greetUser('World');
+console.log(message);`;
+    case 'json':
+      return `{
+  "name": "student-submission",
+  "version": "1.0.0",
+  "description": "Student's JSON submission",
+  "data": {
+    "key": "value"
+  }
+}`;
+    default:
+      return `This is a mock content for ${filename}.\n\nStudent submission content would appear here.\n\nFile size: ${file.size || 'Unknown'}\nSubmitted by: Student`;
+  }
+}
+
 function showGradingModal(submission) {
   let selectedOverallComment = '';
   let selectedScore = '';
@@ -185,7 +528,7 @@ function showGradingModal(submission) {
   
   const submitGrade = () => {
     if (!selectedOverallComment || !selectedScore) {
-      alert('Please select both overall comment and score.');
+      showNotification('กรุณาเลือกทั้งความเห็นรวมและคะแนน', 'warning');
       return;
     }
     
@@ -215,7 +558,7 @@ function showGradingModal(submission) {
       localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
     }
     
-    alert('Grade submitted successfully!');
+    showNotification('Submit Grade Success!', 'success');
     hideModal();
     // Refresh the submissions page
     renderMentorSubmissions();
@@ -224,32 +567,43 @@ function showGradingModal(submission) {
   const modalContent = h('div', { style: 'max-width: 1000px; width: 95vw; max-height: 90vh; overflow-y: auto;' }, [
     h('div', { style: 'display: flex; gap: 20px; min-height: 500px;' }, [
       // Left panel - Submission details
-      h('div', { style: 'flex: 1; background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); min-width: 300px;' }, [
-        h('h2', { style: 'margin: 0 0 16px 0;' }, submission.assignment || submission.challenge || 'Submission'),
+      h('div', { style: 'flex: 1; background: var(--gradient-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); min-width: 300px; color: var(--text);' }, [
+        h('h2', { style: 'margin: 0 0 16px 0; color: var(--text);' }, submission.assignment || submission.challenge || 'Submission'),
         h('div', { class: 'muted', style: 'margin-bottom: 20px;' }, `Submitted by ${submission.by} (${submission.team}) on ${submission.at}`),
         
         h('div', { style: 'margin-bottom: 16px;' }, [
-          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500;' }, 'ไฟล์แนบ (Attached Files)'),
+          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);' }, 'ไฟล์แนบ (Attached Files)'),
           h('div', { class: 'muted', style: 'margin-bottom: 8px;' }, submission.files ? submission.files.map(f => f.name).join(', ') : 'No files'),
-          h('div', { style: 'display: flex; gap: 8px;' }, 
-            (submission.files || []).map(file => 
+          h('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap;' }, 
+            (submission.files || []).map((file, index) => 
               h('div', { 
-                style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated);' 
-              }, '📄')
+                style: 'width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-elevated); cursor: pointer; transition: all 0.3s ease;',
+                onclick: () => openFile(file, index)
+              }, [
+                h('div', { style: 'font-size: 20px; margin-bottom: 4px;' }, getFileIcon(file.name)),
+                h('div', { style: 'font-size: 10px; text-align: center; color: var(--muted); word-break: break-all;' }, file.name.length > 8 ? file.name.substring(0, 8) + '...' : file.name)
+              ])
             )
-          )
+          ),
+          // Download all files button
+          (submission.files && submission.files.length > 0) ? 
+            h('button', { 
+              class: 'btn ghost', 
+              style: 'margin-top: 12px; width: 100%;',
+              onclick: () => downloadAllFiles(submission.files)
+            }, '📥 ดาวน์โหลดไฟล์ทั้งหมด') : null
         ])
       ]),
       
       // Right panel - Grading interface
-      h('div', { style: 'flex: 2; background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border);' }, [
+      h('div', { style: 'flex: 2; background: var(--gradient-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); color: var(--text);' }, [
         h('div', { style: 'margin-bottom: 20px;' }, [
-          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500;' }, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
+          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);' }, 'นักเรียนต้องกรอกข้อมูลตามเหล่านี้ได้ (Student Requirements)'),
           h('div', { class: 'muted' }, '• Requirement 1\n• Requirement 2\n• Requirement 3')
         ]),
         
         h('div', { style: 'margin-bottom: 20px;' }, [
-          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500;' }, 'ความเห็นรวม (Overall Comment)'),
+          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);' }, 'ความเห็นรวม (Overall Comment)'),
           h('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap;' }, 
             rubricOptions.map(option => 
               h('button', { 
@@ -266,7 +620,7 @@ function showGradingModal(submission) {
         ]),
         
         h('div', { style: 'margin-bottom: 20px;' }, [
-          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500;' }, 'ให้คะแนน (Give Score)'),
+          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);' }, 'ให้คะแนน (Give Score)'),
           h('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap;' }, 
             rubricOptions.map(option => 
               h('button', { 
@@ -283,10 +637,10 @@ function showGradingModal(submission) {
         ]),
         
         h('div', { style: 'margin-bottom: 20px;' }, [
-          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500;' }, 'Comment'),
+          h('label', { style: 'display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);' }, 'Comment'),
           h('textarea', { 
             id: 'grade-comment',
-            style: 'width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; resize: vertical; min-height: 80px;',
+            style: 'width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; resize: vertical; min-height: 80px; background: var(--bg-elevated); color: var(--text);',
             placeholder: 'Comment...'
           })
         ]),
@@ -306,6 +660,50 @@ function showGradingModal(submission) {
 
 // Simple modal
 let currentModal = null;
+let currentFileModal = null;
+
+function showFileModal(content) {
+  const backdrop = h('div', { 
+    class: 'modal-backdrop',
+    style: 'z-index: 1000;', // Higher z-index than main modal
+    onclick: (e) => {
+      if (e.target === backdrop) {
+        hideFileModal();
+      }
+    }
+  }, [
+    h('div', { class: 'modal' }, [
+      h('button', { 
+        class: 'modal-close',
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('File modal close button clicked');
+          hideFileModal();
+        }
+      }, '×'),
+      content
+    ])
+  ]);
+  document.body.appendChild(backdrop);
+  setTimeout(() => backdrop.classList.add('show'), 10);
+  currentFileModal = backdrop;
+}
+
+function hideFileModal() {
+  console.log('hideFileModal called, currentFileModal:', currentFileModal);
+  if (currentFileModal) {
+    currentFileModal.classList.remove('show');
+    setTimeout(() => {
+      if (currentFileModal && currentFileModal.parentNode) {
+        currentFileModal.parentNode.removeChild(currentFileModal);
+        console.log('File modal removed from DOM');
+      }
+      currentFileModal = null;
+    }, 300);
+  }
+}
+
 function showModal(content) {
   const backdrop = h('div', { 
     class: 'modal-backdrop',
@@ -318,8 +716,12 @@ function showModal(content) {
     h('div', { class: 'modal' }, [
       h('button', { 
         class: 'modal-close',
-        onclick: hideModal,
-        style: 'position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); z-index: 10;'
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Close button clicked');
+          hideModal();
+        }
       }, '×'),
       content
     ])
@@ -329,11 +731,17 @@ function showModal(content) {
   currentModal = backdrop;
 }
 function hideModal() {
+  console.log('hideModal called, currentModal:', currentModal);
+  // Also close file modal if it's open
+  if (currentFileModal) {
+    hideFileModal();
+  }
   if (currentModal) {
     currentModal.classList.remove('show');
     setTimeout(() => {
       if (currentModal && currentModal.parentNode) {
         currentModal.parentNode.removeChild(currentModal);
+        console.log('Modal removed from DOM');
       }
       currentModal = null;
     }, 300);
@@ -1355,7 +1763,7 @@ function renderStudentChallenge(id) {
           state.mock.submissions.push(newSubmission);
           localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
           
-          alert('Submission sent successfully!');
+          showNotification('ส่งงานเรียบร้อยแล้ว!', 'success');
           hideModal();
           navigate('student-challenges');
         }}, 'Submit')
@@ -1628,7 +2036,7 @@ function renderStudentAssignment(id) {
           state.mock.submissions.push(newSubmission);
           localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
           
-          alert('Assignment submitted successfully!');
+          showNotification('ส่งงานเรียบร้อยแล้ว!', 'success');
           hideModal();
           navigate('student-assignments');
         }}, 'Submit')
@@ -1908,7 +2316,7 @@ function renderStudentCredits() {
           // Save users data
           localStorage.setItem('users', JSON.stringify(state.mock.users));
           
-          alert('Redeemed successfully!');
+          showNotification('แลกเครดิตเรียบร้อยแล้ว!', 'success');
           hideModal();
           // Refresh the page to show updated balance
           renderStudentCredits();
@@ -2296,7 +2704,7 @@ function renderMentorCredits() {
           // Save users data
           localStorage.setItem('users', JSON.stringify(state.mock.users));
           
-          alert('Kudos sent successfully!');
+          showNotification('ส่ง Kudos เรียบร้อยแล้ว!', 'success');
           hideModal();
           // Reset form
           userSelect.value = '';
@@ -2579,11 +2987,10 @@ function renderMentorSubmission(id) {
       const overallLabel = rubricOptions.find(o => o.value === selectedOverallComment)?.label;
       const scoreLabel = rubricOptions.find(o => o.value === selectedScore)?.label;
       
-      showModal(h('div', {}, [
-        h('h2', {}, 'Submit Grade'),
-        h('p', {}, `Submit grade for ${submission.by}'s submission?\n\nOverall: ${overallLabel}\nScore: ${scoreLabel}${commentInput.value ? `\n\nComment: ${commentInput.value}` : ''}`),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'row right' }, [
+      showModal(h('div', { style: 'padding: 40px 48px; max-width: 500px; margin: 20px;' }, [
+        h('h2', { style: 'margin: 0 0 24px 0; text-align: center; color: var(--text);' }, 'Submit Grade'),
+        h('p', { style: 'margin: 0 0 32px 0; line-height: 1.6; color: var(--muted); text-align: center;' }, `Submit grade for ${submission.by}'s submission?\n\nOverall: ${overallLabel}\nScore: ${scoreLabel}${commentInput.value ? `\n\nComment: ${commentInput.value}` : ''}`),
+        h('div', { style: 'display: flex; gap: 16px; justify-content: center; margin-top: 32px;' }, [
           h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
           h('button', { class: 'btn primary', onclick: () => {
             // Update submission with grade
@@ -2610,7 +3017,7 @@ function renderMentorSubmission(id) {
               localStorage.setItem('submissions', JSON.stringify(state.mock.submissions));
             }
             
-            alert('Grade submitted successfully!');
+            showNotification('ส่งคะแนนเรียบร้อยแล้ว!', 'success');
             hideModal();
             navigate('mentor-submissions');
           }}, 'Submit Grade')
@@ -2788,14 +3195,13 @@ function renderMentorGradeSubmission(id) {
       const overallLabel = rubricOptions.find(o => o.value === selectedOverallComment)?.label;
       const scoreLabel = rubricOptions.find(o => o.value === selectedScore)?.label;
       
-      showModal(h('div', {}, [
-        h('h2', {}, 'Submit Grade'),
-        h('p', {}, `Submit grade for ${submission.by}'s submission?\n\nOverall: ${overallLabel}\nScore: ${scoreLabel}${commentInput.value ? `\n\nComment: ${commentInput.value}` : ''}`),
-        h('div', { class: 'spacer' }),
-        h('div', { class: 'row right' }, [
+      showModal(h('div', { style: 'padding: 40px 48px; max-width: 500px; margin: 20px;' }, [
+        h('h2', { style: 'margin: 0 0 24px 0; text-align: center; color: var(--text);' }, 'Submit Grade'),
+        h('p', { style: 'margin: 0 0 32px 0; line-height: 1.6; color: var(--muted); text-align: center;' }, `Submit grade for ${submission.by}'s submission?\n\nOverall: ${overallLabel}\nScore: ${scoreLabel}${commentInput.value ? `\n\nComment: ${commentInput.value}` : ''}`),
+        h('div', { style: 'display: flex; gap: 16px; justify-content: center; margin-top: 32px;' }, [
           h('button', { class: 'btn ghost', onclick: hideModal }, 'Cancel'),
           h('button', { class: 'btn primary', onclick: () => {
-            alert('Grade submitted successfully!');
+            showNotification('ส่งคะแนนเรียบร้อยแล้ว!', 'success');
             hideModal();
             navigate('mentor-assignments');
           }}, 'Submit Grade')

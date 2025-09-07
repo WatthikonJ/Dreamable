@@ -29,6 +29,7 @@ html, body {
   height: 100%; 
   margin: 0;
   padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 body {
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -39,12 +40,13 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   min-height: 100vh;
-  height: 100%;
+  height: auto; /* Changed from 100% to auto to prevent white borders */
   color: var(--text);
   letter-spacing: 0.3px;
   line-height: 1.6;
   font-size: 16px;
   font-weight: 400;
+  position: relative;
 }
 
 html {
@@ -53,7 +55,8 @@ html {
   background-size: cover;
   background-repeat: no-repeat;
   min-height: 100vh;
-  height: 100%;
+  height: auto; /* Changed from 100% to auto */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .container {
@@ -64,6 +67,8 @@ html {
   display: flex;
   flex-direction: column;
   gap: 32px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Dashboard Layout */
@@ -880,6 +885,10 @@ html {
   .dashboard-content.three-columns {
     grid-template-columns: 1fr 1fr;
   }
+  
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
@@ -951,6 +960,51 @@ html {
     padding: 10px 16px;
     font-size: 14px;
   }
+  
+  /* Improve table responsiveness */
+  .table {
+    font-size: 14px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 8px;
+  }
+  
+  /* Better modal responsiveness */
+  .modal {
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+/* Medium screens */
+@media (max-width: 992px) {
+  .container {
+    padding: 24px 20px;
+  }
+  
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .dashboard-sidebar {
+    position: static;
+    order: 2;
+  }
+  
+  .dashboard-main {
+    order: 1;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  .kpis {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
 }
 
 @media (max-width: 480px) {
@@ -1003,6 +1057,17 @@ html {
   .modal div[style*="min-width: 300px"] {
     min-width: auto !important;
   }
+  
+  /* Extra small screens */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .kpis {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 /* Force background on all elements to prevent white flash */
@@ -1020,6 +1085,19 @@ html {
 body::before {
   content: '';
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--gradient-bg);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Additional background coverage for scroll areas */
+body::after {
+  content: '';
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
